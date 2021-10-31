@@ -2906,32 +2906,14 @@
 
 )
 
+
+
 ;/* *********************************************************************
-;Function Name: removeEngineTile
-;Purpose: This function removes the engine tile from the initial deck of tile.
-;Parameters:    1)tile_position-->position of the engine tile
-;               2)shuffleddeck-->deck from where tile is to be removed.
-;Return Value:  deck with engine tile removed
-;Algorithm:   
-;Assistance Received: none
-;********************************************************************* */
-(defun removeEnginetile(tile_position shuffleddeck)
-  (COND 
-    ((< tile_position 1)
-      shuffleddeck)
-    ((= tile_position 1)
-      (REST shuffleddeck))
-    (t
-      (CONS (FIRST shuffleddeck) (removeEnginetile (- tile_position 1) (REST shuffleddeck))))
-    )
-)
-;this function returns if a given tile is a double tile.
-;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: Checkdoubletile
+;Purpose: This function returns if a given tile is a double tile.
+;Parameters:    tile-->tile to be checked
+;Return Value:  t or nil based on if tile is double
+;Algorithm:   --
 ;Assistance Received: none
 ;********************************************************************* */
 (defun Checkdoubletile(tile)
@@ -2947,13 +2929,16 @@
 
 )
 
-;this function checks if there is a possible orphan double train among all the trains.
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: Orphandoubleexists
+;Purpose: This function checks if there is a possible orphan double train among all the trains.
+;Parameters:    1)humantrain --> tiles of humantrain
+;               2)computertrain--> tiles of computer train
+;               3)mexicantrain--> tiles of mexican train
+;               4)markerslist--> state of players train marker
+;Return Value:  t if there is any double tile at the end of any train, nil otherwise.
+;Algorithm:   check the last tile of all the trains and if double return t, nil otherwise.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun Orphandoubleexists (humantrain computertrain mexicantrain markerslist)
@@ -2984,13 +2969,13 @@
                         nil
                     ))))))
 
-;this returns if a train given is an orphan train or not.
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: Isorphantrain
+;Purpose: This returns if a train given is an orphan train or not.
+;Parameters:   train--> tiles of the train
+;Return Value:  t or nil based on last tile of the train.
+;Algorithm:   check if the last tile of the train is double or not.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun Isorphantrain(train) 
@@ -3005,13 +2990,14 @@
                     nil
                 ))))
 
-;this gives the total score when the remaining tiles of the player is given as input.
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: totalscoreoftrain
+;Purpose: This gives the total score when the remaining tiles of the player is given as input.
+;Parameters: 1)vect --> tiles of the train
+;            2)totalscore--> initial score without counting the current tiles
+;Return Value:  totalscoreoftrain.
+;Algorithm:   add the sum of first tile to total and recursively calculate sum of the rest of the tiles.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun totalscoreoftrain(vect total) 
@@ -3026,18 +3012,19 @@
                     (sum  (+ (first (car vect) ) (second (car vect) ) ))
                     (newtotal (+ total sum))
                 )
-                ;(print sum)
-                ;(print newtotal)
                 (totalscoreoftrain (rest vect) newtotal)
             ))))
 
-;this function helps to erase computer marker from computer train tiles that contains a marker
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: removecomputermarker
+;Purpose: This function helps to erase computer marker from computer train tiles that contains a marker.
+;           This function is used when the computer train tiles are extracted from user text file.
+;Parameters: vect--> tiles of computer train along with possible marker at the front
+;Return Value:  computertraintiles without marker
+;Algorithm:     check if the first item of the list is list:
+;                   -if it is list, no marker is present so no need to remove 
+;                   -if it is not a list, there is a marker present so return rest of the tiles as computer train tiles.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun removecomputermarker(vect) 
@@ -3054,13 +3041,16 @@
     )   
 )
 
-;this function helps to erase human train marker from the train tiles taken as input from the file
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name:     removehumanmarker
+;Purpose:           This function helps to erase human train marker from the train tiles taken as input from the file
+;                   This function is used when the human train tiles are extracted from user text file.
+;Parameters:        vect--> list of tile that may contain marker at the end
+;Return Value:      computer train tiles without a marker
+;Algorithm:         check if the last item of the list is list:
+;                   -if it is list, no marker is present so no need to remove 
+;                   -if it is not a list, there is a marker present so return rest of the tiles as human train tiles.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun removehumanmarker(vect) 
@@ -3080,13 +3070,15 @@
             (removeTile (length vect) vect) 
         ))))
 
-;this function checks if there is a marker on list of human train tiles and returns t or nil
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: humantrainmarker
+;Purpose: This function checks if there is a marker on list of human train tiles and returns t or nil
+;Parameters:    vect--> list of tile that may contain marker at the end
+;Return Value:  t or nil based on the presence of marker
+;Algorithm:   check if the last item of the list is list:
+;                   -if it is list, no marker is present so return nil
+;                   -if it is not a list, there is a marker present so return t.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun humantrainmarker(vect) 
@@ -3105,13 +3097,15 @@
         ))))
 
 
-;this function returns if the vect or computertraintiles has a marker at the begining of the list
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: computertrainmarker
+;Purpose: This function returns if the vect or computertraintiles has a marker at the begining of the list
+;Parameters:    vect--> list of tile that may contain marker at the front
+;Return Value:  t or nil based on the presence of marker
+;Algorithm:     check if the last item of the list is list:
+;                   -if it is list, no marker is present so return nil
+;                   -if it is not a list, there is a marker present so return t.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun computertrainmarker(vect)
@@ -3128,13 +3122,15 @@
     )  
 )
 
-;this function helps to reverse the computer tiles inside the individual tiles.
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: reversecomputertrain
+;Purpose: This function helps to reverse the computer tiles inside the individual tiles.
+;Parameters:    1)vect -->tiles of computertrain
+;               2)reversed -->part of tiles that are already reversed
+;Return Value:  reversed computer train.
+;Algorithm:     1)get the first tile and add to the end of reversedlist
+;               2) call the function with rest of the tiles and do the same process with rest of the tiles until no tiles are left.
 ;Assistance Received: none
 ;********************************************************************* */
 (defun reversecomputertrain(vect reversed)
@@ -3158,13 +3154,13 @@
 
 )
  
-;this function is used to read the next player from the input text file.
+
 ;/* *********************************************************************
-;Function Name: 
-;Purpose: 
-;Parameters:
-;Return Value:  
-;Algorithm:   
+;Function Name: gethumannext
+;Purpose: This function is used to read the next player from the input text file.
+;Parameters:    nextplayer--> string value that contains the name of next player 
+;Return Value:  t if the value is human , nil if computer 
+;Algorithm:     ---- 
 ;Assistance Received: none
 ;********************************************************************* */
 (defun gethumannext (nextplayer)
